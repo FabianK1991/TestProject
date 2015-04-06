@@ -14,6 +14,7 @@ import org.neuroph.nnet.learning.BackPropagation;
  * 		ZU PERFORMANCE: PREFINAL, SEMI FINAL, FINAL
  * 		MEHR GEWICHTET: LETZTE SPIELE
  * 		MEHR GEWICHTET: SPIELE GEGEN DEN GEGNER
+ * 
  */
 public class TennisGamePredictionNetwork {
 	private MultiLayerPerceptron neuralNet;
@@ -23,8 +24,8 @@ public class TennisGamePredictionNetwork {
 		neuralNet = new MultiLayerPerceptron(5, 8, 2);
 		
 		learningRule = neuralNet.getLearningRule();
-		learningRule.setLearningRate(0.1);
-		learningRule.setMaxIterations(1000000);
+		learningRule.setLearningRate(0.05);
+		learningRule.setMaxIterations(10000000);
 	}
 	
 	public void train(DataSet trainingSet){

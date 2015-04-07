@@ -6,10 +6,10 @@
 	<classpathentry kind="lib" path="D:/Programmieren/Java Libs/neuroph-2.9/neuroph-core-2.9.jar"/>
 	<classpathentry kind="lib" path="D:/Programmieren/Java Libs/neuroph-2.9/neuroph-samples-2.9.jar"/>
 	<classpathentry kind="lib" path="D:/Programmieren/Java Libs/neuroph-2.9/libs/ajt-2.9.jar"/>
-	<classpathentry kind="lib" path="D:/Programmieren/Java Libs/neuroph-2.9/libs/android-x.x.jar"/>
 	<classpathentry kind="lib" path="D:/Programmieren/Java Libs/neuroph-2.9/libs/javaml-0.1.7.jar"/>
 	<classpathentry kind="lib" path="D:/Programmieren/Java Libs/neuroph-2.9/libs/slf4j-api-1.7.5.jar"/>
 	<classpathentry kind="lib" path="D:/Programmieren/Java Libs/neuroph-2.9/libs/slf4j-nop-1.7.6.jar"/>
 	<classpathentry kind="lib" path="D:/Programmieren/Java Libs/neuroph-2.9/libs/weka.jar"/>
+	<classpathentry kind="lib" path="D:/Programmieren/eclipse_workspace/BettingSystem/lib/org.json-20120521.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

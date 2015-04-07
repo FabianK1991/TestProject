@@ -146,7 +146,7 @@ public class WettpointParser extends WebsiteParser {
 	
 	// http://stackoverflow.com/questions/418898/sqlite-upsert-not-insert-or-replace
 	private void parsePlayerStats(String playerId) throws Exception{
-		 String url = playerUrl + playerId + ".html";
+		 String url = playerUrl + playerId + ".aspx";
 		 
 		 String response = sendGet( url );
 		 

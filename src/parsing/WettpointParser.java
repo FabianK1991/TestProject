@@ -42,6 +42,10 @@ import util.Loggar;
  * TOURNAMENT_ID		INT
  * TOURNAMENT_NAME		STRING
  * 
+ * http://www.itftennis.com/procircuit/players/player/profile.aspx?PlayerID=30019224
+ * http://www.daviscup.com/en/players/player/profile.aspx?playerid=30019224
+ * http://www.atpworldtour.com/Tennis/Players/Top-Players/Yen-Hsun-Lu.aspx?t=pa
+ * 
  */
 public class WettpointParser extends WebsiteParser {
 	private final static String searchUrl = "http://tennis.wettpoint.com/en/search.html";

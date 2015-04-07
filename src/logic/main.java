@@ -51,7 +51,7 @@ public class main {
     	WettpointParser wp = new WettpointParser();
         
     	try {
-			wp.searchPlayer("R. Federer");
+			wp.searchPlayer("Y. Lu");
     		//wp.searchPlayer("P. Pimmel");
 		} catch (Exception e) {
 			e.printStackTrace();

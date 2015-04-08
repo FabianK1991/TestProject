@@ -14,6 +14,7 @@ import org.neuroph.core.data.DataSetRow;
 import database.DBHandler;
 import parsing.ATPWorldParser;
 import parsing.WettpointParser;
+import testing.TennisModelBenchmark;
 import util.Loggar;
 
 public class main {
@@ -39,6 +40,10 @@ public class main {
 	
 	
     public static void main(String args[]) {
+    	TennisModelBenchmark tmb = new TennisModelBenchmark();
+    	
+    	tmb.peformBenchmark("Roger Federer");
+    	
     	// INPUT: ENEMY PERFORMANCE LAST 5 GAMES, ENEMY RATING, PERFORMANCE LAST 5 GAMES, HARD COURT, CLAY COURT
     	
     	/*ResultSet rs = db.exec("SELECT * FROM GameData");
@@ -80,7 +85,7 @@ public class main {
 		}*/
     	
     	
-    	
+    	/*
     	ATPWorldParser wp = new ATPWorldParser();
     	
     	// HARDCORE TEST: RAFAEL ANTONIO COUTINHO
@@ -110,7 +115,7 @@ public class main {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
     	
     	/*WettpointParser wp = new WettpointParser();
         

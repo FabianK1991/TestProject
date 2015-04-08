@@ -40,7 +40,7 @@ public class TennisGameTrainingSetGenerator {
 		public boolean prefinal;
 	}
 	
-	private boolean isPrefinal(String round){
+	private static boolean isPrefinal(String round){
 		switch(round){
 			case "S":
 			case "Q":
@@ -52,11 +52,11 @@ public class TennisGameTrainingSetGenerator {
 		return true;
 	}
 	
-	private boolean isIndoorCourt(String court_type){
+	private static boolean isIndoorCourt(String court_type){
 		return (court_type.indexOf("Outdoor") == -1) ? true : false;
 	}
 	
-	private boolean isHardCourt(String court_type){
+	private static boolean isHardCourt(String court_type){
 		if( court_type.indexOf("Hard") >= -1 ) return true;
 		if( court_type.indexOf("Clay") >= -1 ) return true;
 		if( court_type.indexOf("Stone") >= -1 ) return true;
@@ -64,7 +64,7 @@ public class TennisGameTrainingSetGenerator {
 		return false;
 	}
 	
-	private boolean isWin(String result_string, boolean isPlayerFirst){
+	private static boolean isWin(String result_string, boolean isPlayerFirst){
 		if( isPlayerFirst ){
 			return (result_string.charAt(0) == 'W') ? true : false; 
 		}
@@ -178,9 +178,9 @@ public class TennisGameTrainingSetGenerator {
 			//System.out.println(calcRanking(30));
 			//System.out.println(calcRanking(100));
 			//System.out.println(calcRanking(1000));
-			TennisGameTrainingSetGenerator t = new TennisGameTrainingSetGenerator();
+			//TennisGameTrainingSetGenerator t = new TennisGameTrainingSetGenerator();
 			
-			t.generateDataSet("Roger Federer");
+			//t.generateDataSet("Roger Federer");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -195,9 +195,9 @@ public class TennisGameTrainingSetGenerator {
 		
 	}
 	
-	private List<TennisTrainingDataSet> getDataSets(String name, int time) throws Exception{
+	private List<TennisTrainingDataSet> getDataSets(String name, int time, String tillTime) throws Exception{
 		String id = main.db.select("tennis_player", new String[]{"id"}, "name = '" + name + "'").get(0)[0];
-		String sql = "SELECT first_player_id,first_player_ranking,second_player_id,second_player_ranking,round,time,result_string,court_type FROM tennis_GAMES as tg INNER JOIN tenNIS_TOURNAMENT as tt ON tg.tournament_id = tt.id WHERE first_player_id = '" + id + "' OR second_player_id = '" + id + "' AND TIME >= '" + time + "'";
+		String sql = "SELECT first_player_id,first_player_ranking,second_player_id,second_player_ranking,round,time,result_string,court_type FROM tennis_GAMES as tg INNER JOIN tenNIS_TOURNAMENT as tt ON tg.tournament_id = tt.id WHERE first_player_id = '" + id + "' OR second_player_id = '" + id + "' AND TIME >= '" + time + "' AND TIME <= '" + tillTime + "' ORDER BY TIME DESC";
 	
 		ResultSet rs = main.db.exec(sql, null, true);
 		List<TennisTrainingDataSet> result = new ArrayList<TennisTrainingDataSet>();
@@ -237,13 +237,47 @@ public class TennisGameTrainingSetGenerator {
 		return null;
 	}
 	
-	public DataSet generateDataSet(String Player){
+	public static double[] generateInputFromGameId(String gameId, String name){
+		String id = main.db.select("tennis_player", new String[]{"id"}, "name = '" + name + "'").get(0)[0];
+		String sql = "SELECT first_player_id,first_player_ranking,second_player_id,second_player_ranking,round,result_string,court_type FROM tennis_GAMES WHERE id = '" + gameId + "'";
+		
+		ResultSet rs = main.db.exec(sql, null, true);
+		
+		try {
+			double[] result = new double[4];
+			
+			while(rs.next()){
+				try{
+					if( id.equals(rs.getString("first_player_id")) ){
+						result[0] = calcRanking(rs.getInt("second_player_ranking"));
+					}
+					else{
+						result[0] = calcRanking(rs.getInt("first_player_ranking"));
+					}
+					
+					result[1] = (isPrefinal(rs.getString("round"))) ? 1 : 0;
+					result[2] = (isIndoorCourt(rs.getString("court_type"))) ? 1 : 0;
+					result[3] = (isHardCourt(rs.getString("court_type"))) ? 1 : 0;
+				}catch( Exception e){
+					continue;
+				}
+			}
+
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public DataSet generateDataSet(String Player, String tillTime){
 		// 
 		int curTime = (int)(new Date().getTime()/1000);
 		curTime -= gameRange;
 		
 		try {
-			List<TennisTrainingDataSet> l = getDataSets(Player, curTime);
+			List<TennisTrainingDataSet> l = getDataSets(Player, curTime, tillTime);
 			DataSet ds = new DataSet(4, 1);
 			
 			for( TennisTrainingDataSet tt : l ){

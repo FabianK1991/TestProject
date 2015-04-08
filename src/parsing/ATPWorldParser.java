@@ -1,5 +1,8 @@
 package parsing;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Calendar;
@@ -52,7 +55,7 @@ public class ATPWorldParser extends WebsiteParser {
 	private final static String playerUrlRetrievalUrl = "http://www.atpworldtour.com/Tennis/Players/";
 	
 	// inclusive current year
-	private final static int parseYears = 1; 
+	private final static int parseYears = 2; 
 	
 	/*
 	 * DB update player
@@ -69,6 +72,74 @@ public class ATPWorldParser extends WebsiteParser {
 		main.db.exec(sql, null, false);
 	}
 	
+	private void upsertGame(String tournament_id, String first_player_id, String first_player_ranking, String second_player_id, String second_player_ranking, String round, String result_string, String result){
+		Loggar.logln(tournament_id + " - " + first_player_id + ":" + first_player_ranking + " vs. " + second_player_id + ":" + second_player_ranking + " - " + round + " result: " + result + " d: " + result_string);
+	
+		// Check if game exists already
+		String sql = "SELECT id FROM Tennis_Games WHERE tournament_id = '" + tournament_id + "' AND round = '" + round + "' AND ((first_player_id = '" + first_player_id + "' AND second_player_id = '" + second_player_id + "') OR (first_player_id = '" + second_player_id + "' AND second_player_id = '" + first_player_id + "'))";
+		ResultSet rs = main.db.exec(sql, null, true);
+		
+		try {
+			while(rs.next()){
+				return;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// Insert dat bitch
+		sql = "INSERT INTO Tennis_Games (tournament_id, first_player_id, first_player_ranking, second_player_id, second_player_ranking, round, result_string, result) VALUES ('" + tournament_id + "','" + first_player_id + "','" + first_player_ranking + "','" + second_player_id + "','" + second_player_ranking + "','" + round + "','" + result_string + "','" + result + "')";
+		
+		main.db.exec(sql, null, false);
+	}
+	
+	private String getPlayerIdAndInsertIfNotExist(String name){
+		String id = getPlayerId(name);
+		
+		if( id == null ){
+			String sql = "INSERT INTO Tennis_Player (name) VALUES ('" + name + "')";
+			
+			main.db.exec(sql, null, false);
+			
+			return getPlayerId(name);
+		}
+		else{
+			return id;
+		}
+	}
+	
+	private String getPlayerId(String name){
+		String sql = "SELECT id FROM Tennis_Player WHERE name = '" + name + "'";
+		
+		ResultSet rs = main.db.exec(sql, null, true);
+		
+		try {
+			while(rs.next()){
+				return rs.getString("id");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	private String getTournamentId(String name, String time){
+		String sql = "SELECT id FROM TENNIS_TOURNAMENT WHERE name = '" + name + "' AND time = '" + time + "'";
+		
+		ResultSet rs = main.db.exec(sql, null, true);
+		
+		try {
+			while(rs.next()){
+				return rs.getString("id");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	private String buildGetParameters(String year, boolean singles){
 		String _singles = "s";
 		
@@ -79,16 +150,25 @@ public class ATPWorldParser extends WebsiteParser {
 		return "?t=pa&y=" + year + "&m=" + _singles;
 	}
 	
-	private void printArray(String[] arr){
-		for(int i=0;i<arr.length;i++){
-			Loggar.log(arr[i] + " ");
+	private String formatPlayerRating(String rating){
+		if( rating == null ){
+			return "2500";
 		}
 		
-		Loggar.log("\n\n");
+		String formatted = rating.replaceAll(",", "");
+		
+		if( formatted.length() == 0 || formatted.equals("N/A") ){
+			return "2500";
+		}
+		
+		return formatted;
 	}
 	
-	private void getPlayerGames(String url, String year) throws Exception{
+	private void getPlayerGames(String url, String year, String playerName) throws Exception{
 		String response = sendGet( url + buildGetParameters(year, true) );
+		
+		// split response
+		response = response.substring(response.indexOf("<div class=\"genericButton\">"), response.indexOf("<div class=\"genericModuleHeader\">"));
 		
 		// Patterns
 		Pattern pTournamentBox = Pattern.compile("<div class\\=\"commonProfileContainer\">\\s*<p class=\"bioPlayActivityInfo\">(.*?<p class=\"bioPlayActivityInfo\">.*?)</div>");
@@ -100,27 +180,42 @@ public class ATPWorldParser extends WebsiteParser {
 		
 		while(m.find()){
 			String tournamentBox = m.group(1);
-			
-			//Loggar.log("\n");
-			
+
 			// Tournament Infos
 			// name location date points type draw
 			String[] tournamentInfos = returnMatchedValue(pTournamentInfos, tournamentBox, new int[]{1,3,4,5,6,7});
+			// event points atp ranking prize money
+			String[] tournamentOutcome = returnMatchedValue(pTournamentOutcome, tournamentBox, new int[]{1,3,5});
 			
-			upsertTournament(tournamentInfos[0], tournamentInfos[1], tournamentInfos[2], tournamentInfos[3], tournamentInfos[4], tournamentInfos[5]);
+			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+			Date parsedDate = sdf.parse(tournamentInfos[2]);
+			String dateString = Integer.toString((int)(parsedDate.getTime()/1000));
+			
+			upsertTournament(tournamentInfos[0], tournamentInfos[1], dateString, tournamentInfos[3], tournamentInfos[4].replaceAll("\\&nbsp\\;", " "), tournamentInfos[5]);
 			//printArray(tournamentInfos);
+			//printArray(tournamentOutcome);
 			
 			// Game rows
 			
 			// round opponent ranking score
 			List<String[]> gameRows = returnMatchedValues(pGameRow, tournamentBox, new int[]{1,2,3,4});
+			String tournamentId = getTournamentId(tournamentInfos[0], dateString);
+			String playerId = getPlayerId(playerName);
+			String playerRanking = formatPlayerRating(tournamentOutcome[1].replaceAll(".*ATP Ranking\\:\\&nbsp\\;(.*)", "$1"));
 			
-			//for(String[] row : gameRows){printArray(row);}Loggar.log("\n");
-			
-			// tournament outcome
-			String[] tournamentOutcome = returnMatchedValue(pTournamentOutcome, tournamentBox, new int[]{1,3,5});
-			
-			//printArray(tournamentOutcome);
+			for(String[] row : gameRows){
+				// exclude bye games
+				if( row[1].equals("Bye") ){
+					continue;
+				}
+				
+				String opponentId = getPlayerIdAndInsertIfNotExist(row[1].replaceAll("<a.*?>(.*?)<\\/a>.*", "$1").replaceAll("\\&nbsp\\;", " "));
+				String opponentRanking = formatPlayerRating(row[2]);
+				String result = ( row[3].charAt(0) == 'W' ) ? "1" : "0";
+				
+				upsertGame(tournamentId, playerId, playerRanking, opponentId, opponentRanking, row[0], row[3], result);
+				//printArray(row);
+			}
 		}
 
 	}
@@ -138,7 +233,12 @@ public class ATPWorldParser extends WebsiteParser {
 		// write player to database
 		upsertPlayerStats(name, rating);
 		
-		//getPlayerGames(playerUrl, "2015");
+		// go get dem!
+	    int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+	    
+	    for(int i=currentYear-parseYears;i<=currentYear;i++){
+	    	getPlayerGames(playerUrl, Integer.toString(i), name);
+	    }
 	}
 	
 	/*

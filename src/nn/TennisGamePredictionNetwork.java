@@ -1,12 +1,13 @@
 package nn;
 
+import org.neuroph.core.Layer;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 
 
 /*
- * 		INPUT: ENEMY PERFORMANCE LAST 5 GAMES, ENEMY RATING, PERFORMANCE LAST 5 GAMES, HARD COURT, CLAY COURT
+ * 		INPUT: ENEMY RANKING, ROUND (PREFINAL / FINAL), INDOOR / OUTDOOR, HARD / SOFT
  * 
  * 		OUTPUT: WIN / LOSS, DEUTLICH / WENIGER DEUTLICH
  * 

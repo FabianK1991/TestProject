@@ -12,11 +12,21 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import util.Loggar;
+
 public class WebsiteParser {
 	private final static String USER_AGENT = "Mozilla/5.0";
 	private final static boolean debug = true;
 	
 	protected String lastVisitedUrl = null;
+	
+	protected void printArray(String[] arr){
+		for(int i=0;i<arr.length;i++){
+			Loggar.log(arr[i] + " ");
+		}
+		
+		Loggar.log("\n\n");
+	}
 	
 	protected String returnMatchedValue(Pattern pattern, String searchString){
 		return returnMatchedValue(pattern, searchString, 1);

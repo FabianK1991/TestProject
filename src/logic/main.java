@@ -82,8 +82,11 @@ public class main {
     	
     	ATPWorldParser wp = new ATPWorldParser();
     	
+    	// HARDCORE TEST: RAFAEL ANTONIO COUTINHO
+    	
     	try {
-			wp.searchPlayer("Rafael Nadal");
+			//wp.searchPlayer("Rafael Nadal");
+    		wp.searchPlayer("Martin Klizan");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

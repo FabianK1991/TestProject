@@ -47,7 +47,7 @@ public class DBHandler
 		try {
 			Statement stmt = this.con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 			
-			System.out.println(secureQuery.toString());
+			//System.out.println(secureQuery.toString());
 			
 			if(read){
 				ResultSet rs = stmt.executeQuery(secureQuery.toString());

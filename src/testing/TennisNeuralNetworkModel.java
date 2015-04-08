@@ -12,6 +12,8 @@ public class TennisNeuralNetworkModel extends ModelWrapper {
 
 	@Override
 	public void init(String player, String tillTime) {
+		this.player = player;
+		
 		TennisGameTrainingSetGenerator t = new TennisGameTrainingSetGenerator();
 		
 		// Get DataSet
@@ -30,6 +32,8 @@ public class TennisNeuralNetworkModel extends ModelWrapper {
 	@Override
 	public double predictGame(String gameId) {
 		double[] input = TennisGameTrainingSetGenerator.generateInputFromGameId(gameId, player);
+		
+		tn.printInput(input);
 		
 		return tn.calculate(input)[0];
 	}

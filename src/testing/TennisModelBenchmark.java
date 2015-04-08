@@ -21,7 +21,7 @@ public class TennisModelBenchmark {
 	}
 	
 	private boolean getActualResult(String gameId, String playerId){
-		String[] result = main.db.select("tennis_player", new String[]{"first_player_id", "second_player_id", "result"}, "id = '" + gameId + "'").get(0);
+		String[] result = main.db.select("tennis_games", new String[]{"first_player_id", "second_player_id", "result"}, "id = '" + gameId + "'").get(0);
 		
 		if(result[0].equals(playerId)){
 			return ( result[2].equals("0") ) ? false : true;
@@ -40,6 +40,10 @@ public class TennisModelBenchmark {
 		curTime -= validateGameRange;
 		
 		String id = main.db.select("tennis_player", new String[]{"id"}, "name = '" + name + "'").get(0)[0];
+		
+		Loggar.logln("Performing model benchmark for player: " + name);
+		Loggar.logln(TennisDBHelper.getGameCount(id) + " games found!\n\n"); 
+		
 		List<String> games = TennisDBHelper.getGamesSince(String.valueOf(curTime), id);
 		
 		for(ModelWrapper mw : testModels ){
@@ -47,7 +51,7 @@ public class TennisModelBenchmark {
 			
 			int rightAnswers = 0;
 			
-			Loggar.logln("Start predicting " + games.size() + " games!");
+			Loggar.logln("\nStart predicting " + games.size() + " games!");
 			
 			for(String gameId: games){
 				double dprediction = mw.predictGame(gameId);
@@ -63,7 +67,7 @@ public class TennisModelBenchmark {
 				}
 			}
 			
-			Loggar.logln("Overall prediction was: " + rightAnswers + "/" + games.size() + " ratio: " + (double)(rightAnswers/games.size()));
+			Loggar.logln("Overall prediction was: " + rightAnswers + "/" + games.size() + " ratio: " + (double)(rightAnswers/(double)games.size()));
 		}
 	}
 }

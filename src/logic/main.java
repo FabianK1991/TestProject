@@ -42,7 +42,7 @@ public class main {
     public static void main(String args[]) {
     	TennisModelBenchmark tmb = new TennisModelBenchmark();
     	
-    	tmb.peformBenchmark("Roger Federer");
+    	tmb.peformBenchmark("Nicolas Almagro");
     	
     	// INPUT: ENEMY PERFORMANCE LAST 5 GAMES, ENEMY RATING, PERFORMANCE LAST 5 GAMES, HARD COURT, CLAY COURT
     	

@@ -197,7 +197,7 @@ public class TennisGameTrainingSetGenerator {
 	
 	private List<TennisTrainingDataSet> getDataSets(String name, int time, String tillTime) throws Exception{
 		String id = main.db.select("tennis_player", new String[]{"id"}, "name = '" + name + "'").get(0)[0];
-		String sql = "SELECT first_player_id,first_player_ranking,second_player_id,second_player_ranking,round,time,result_string,court_type FROM tennis_GAMES as tg INNER JOIN tenNIS_TOURNAMENT as tt ON tg.tournament_id = tt.id WHERE first_player_id = '" + id + "' OR second_player_id = '" + id + "' AND TIME >= '" + time + "' AND TIME <= '" + tillTime + "' ORDER BY TIME DESC";
+		String sql = "SELECT first_player_id,first_player_ranking,second_player_id,second_player_ranking,round,time,result_string,court_type FROM tennis_GAMES as tg INNER JOIN tenNIS_TOURNAMENT as tt ON tg.tournament_id = tt.id WHERE (first_player_id = '" + id + "' OR second_player_id = '" + id + "') AND TIME >= '" + time + "' AND TIME <= '" + tillTime + "' ORDER BY TIME DESC";
 	
 		ResultSet rs = main.db.exec(sql, null, true);
 		List<TennisTrainingDataSet> result = new ArrayList<TennisTrainingDataSet>();
@@ -239,7 +239,7 @@ public class TennisGameTrainingSetGenerator {
 	
 	public static double[] generateInputFromGameId(String gameId, String name){
 		String id = main.db.select("tennis_player", new String[]{"id"}, "name = '" + name + "'").get(0)[0];
-		String sql = "SELECT first_player_id,first_player_ranking,second_player_id,second_player_ranking,round,result_string,court_type FROM tennis_GAMES WHERE id = '" + gameId + "'";
+		String sql = "SELECT first_player_id,first_player_ranking,second_player_id,second_player_ranking,round,result_string,court_type FROM tennis_GAMES as tg INNER JOIN tenNIS_TOURNAMENT as tt ON tg.tournament_id = tt.id WHERE tg.id = '" + gameId + "'";
 		
 		ResultSet rs = main.db.exec(sql, null, true);
 		

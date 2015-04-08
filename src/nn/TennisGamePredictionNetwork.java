@@ -25,8 +25,18 @@ public class TennisGamePredictionNetwork {
 	private BackPropagation learningRule;
 	
 	public TennisGamePredictionNetwork(){
-		neuralNet = new MultiLayerPerceptron(4, 4, 1);
+		neuralNet = new MultiLayerPerceptron(4, 5, 1);
 		
+		adjustLerningRule();
+	}
+	
+	public TennisGamePredictionNetwork(int incoming, int hidden, int out){
+		neuralNet = new MultiLayerPerceptron(incoming, hidden, out);
+		
+		adjustLerningRule();
+	}
+	
+	private void adjustLerningRule(){
 		learningRule = neuralNet.getLearningRule();
 		learningRule.setLearningRate(0.1);
 		learningRule.setMaxError(0.1);

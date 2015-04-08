@@ -14,6 +14,7 @@ import logic.main;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import database.TennisDBHelper;
 import util.Loggar;
 
 /*
@@ -50,24 +51,26 @@ import util.Loggar;
  * http://stackoverflow.com/questions/418898/sqlite-upsert-not-insert-or-replace
  * 
  */
+
+// TODO: Ranking History
 public class ATPWorldParser extends WebsiteParser {
 	private final static String searchUrl = "http://www.atpworldtour.com/Handlers/AutoComplete.aspx?q=";
 	private final static String playerUrlRetrievalUrl = "http://www.atpworldtour.com/Tennis/Players/";
 	
 	// inclusive current year
-	private final static int parseYears = 2; 
+	private final static int parseYears = 3; 
 	
 	/*
 	 * DB update player
 	 */
 	private void upsertPlayerStats(String name, String atp_ranking){
-		String sql = "INSERT OR REPLACE INTO Tennis_Player (id, name, atp_ranking, last_parsed) VALUES ((SELECT id FROM Tennis_Player WHERE name = '" + name + "'), '" + name + "', '" + atp_ranking + "', '" + (int)(new Date().getTime()/1000) + "')";
+		String sql = "INSERT OR REPLACE INTO Tennis_Player (id, name, atp_ranking, last_parsed) VALUES ((SELECT id FROM Tennis_Player WHERE name = '" + name.replace("'", "") + "'), '" + name.replace("'", "") + "', '" + atp_ranking + "', '" + (int)(new Date().getTime()/1000) + "')";
 		
 		main.db.exec(sql, null, false);
 	}
 	
 	private void upsertTournament(String name, String location, String time, String points, String court_type, String draw_amount){
-		String sql = "INSERT OR REPLACE INTO TENNIS_TOURNAMENT (id, name, time, location, points, court_type, draw_amount) VALUES ((SELECT id FROM TENNIS_TOURNAMENT WHERE name = '" + name + "' AND time = '" + time + "'), '" + name + "', '" + time + "', '" + location + "', '" + points + "', '" + court_type + "', '" + draw_amount + "')";
+		String sql = "INSERT OR REPLACE INTO TENNIS_TOURNAMENT (id, name, time, location, points, court_type, draw_amount) VALUES ((SELECT id FROM TENNIS_TOURNAMENT WHERE name = '" + name.replace("'", "") + "' AND time = '" + time + "'), '" + name.replace("'", "") + "', '" + time + "', '" + location.replace("'", "") + "', '" + points.replace("'", "") + "', '" + court_type.replace("'", "") + "', '" + draw_amount.replace("'", "") + "')";
 		
 		main.db.exec(sql, null, false);
 	}
@@ -94,50 +97,20 @@ public class ATPWorldParser extends WebsiteParser {
 	}
 	
 	private String getPlayerIdAndInsertIfNotExist(String name){
-		String id = getPlayerId(name);
+		name = name.replace("'", "");
+		
+		String id = TennisDBHelper.getPlayerId(name);
 		
 		if( id == null ){
 			String sql = "INSERT INTO Tennis_Player (name) VALUES ('" + name + "')";
 			
 			main.db.exec(sql, null, false);
 			
-			return getPlayerId(name);
+			return TennisDBHelper.getPlayerId(name);
 		}
 		else{
 			return id;
 		}
-	}
-	
-	private String getPlayerId(String name){
-		String sql = "SELECT id FROM Tennis_Player WHERE name = '" + name + "'";
-		
-		ResultSet rs = main.db.exec(sql, null, true);
-		
-		try {
-			while(rs.next()){
-				return rs.getString("id");
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
-	private String getTournamentId(String name, String time){
-		String sql = "SELECT id FROM TENNIS_TOURNAMENT WHERE name = '" + name + "' AND time = '" + time + "'";
-		
-		ResultSet rs = main.db.exec(sql, null, true);
-		
-		try {
-			while(rs.next()){
-				return rs.getString("id");
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
 	}
 	
 	private String buildGetParameters(String year, boolean singles){
@@ -199,8 +172,8 @@ public class ATPWorldParser extends WebsiteParser {
 			
 			// round opponent ranking score
 			List<String[]> gameRows = returnMatchedValues(pGameRow, tournamentBox, new int[]{1,2,3,4});
-			String tournamentId = getTournamentId(tournamentInfos[0], dateString);
-			String playerId = getPlayerId(playerName);
+			String tournamentId = TennisDBHelper.getTournamentId(tournamentInfos[0], dateString);
+			String playerId = TennisDBHelper.getPlayerId(playerName);
 			String playerRanking = formatPlayerRating(tournamentOutcome[1].replaceAll(".*ATP Ranking\\:\\&nbsp\\;(.*)", "$1"));
 			
 			for(String[] row : gameRows){

@@ -163,38 +163,6 @@ public class TennisGameTrainingSetGenerator {
 		return diff;
 	}
 	
-	public static void main( String args[] )
-	{
-		try {
-			/*System.out.println(calcRanking(3, 5));
-			System.out.println(calcRanking(15, 50));
-			System.out.println(calcRanking(30, 1));
-			System.out.println(calcRanking(50, 1));
-			System.out.println(calcRanking(80, 1));
-			System.out.println(calcRanking(120, 1));
-			System.out.println(calcRanking(300, 1));
-			System.out.println(calcRanking(498, 1));
-			System.out.println(calcRanking(1000, 1));*/
-			//System.out.println(calcRanking(30));
-			//System.out.println(calcRanking(100));
-			//System.out.println(calcRanking(1000));
-			//TennisGameTrainingSetGenerator t = new TennisGameTrainingSetGenerator();
-			
-			//t.generateDataSet("Roger Federer");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//System.out.println(calcRanking(5));
-		//System.out.println(calcRanking(100));
-		//System.out.println(calcRanking(70));
-	}
-	
-	private void calcWinLoss(TennisTrainingDataSet ds, String result_string){
-		
-	}
-	
 	private List<TennisTrainingDataSet> getDataSets(String name, int time, String tillTime) throws Exception{
 		String id = main.db.select("tennis_player", new String[]{"id"}, "name = '" + name + "'").get(0)[0];
 		String sql = "SELECT first_player_id,first_player_ranking,second_player_id,second_player_ranking,round,time,result_string,court_type FROM tennis_GAMES as tg INNER JOIN tenNIS_TOURNAMENT as tt ON tg.tournament_id = tt.id WHERE (first_player_id = '" + id + "' OR second_player_id = '" + id + "') AND TIME >= '" + time + "' AND TIME <= '" + tillTime + "' ORDER BY TIME DESC";
@@ -271,19 +239,41 @@ public class TennisGameTrainingSetGenerator {
 		return null;
 	}
 	
+	/*
+	 * Generate Data sets
+	 */
 	public DataSet generateDataSet(String Player, String tillTime){
+		return generateDataSet(Player, tillTime, 4);
+	}
+	
+	public DataSet generateDataSet(String Player, String tillTime, int inputSize){
 		// 
 		int curTime = (int)(new Date().getTime()/1000);
 		curTime -= gameRange;
 		
 		try {
 			List<TennisTrainingDataSet> l = getDataSets(Player, curTime, tillTime);
-			DataSet ds = new DataSet(4, 1);
+			DataSet ds = new DataSet(inputSize, 1);
 			
 			for( TennisTrainingDataSet tt : l ){
 				//Loggar.logln(tt.diffRanking + " - " + tt.time + " - " + tt.hard + " - " + tt.indoor + " - " + tt.prefinal);
-				
-				ds.addRow(new DataSetRow(new double[]{tt.diffRanking, (tt.prefinal) ? 1 : 0, (tt.indoor) ? 1 : 0, (tt.hard) ? 1 : 0}, new double[]{(tt.win) ? 1 : 0}));
+				switch(inputSize){
+				case 1:
+					ds.addRow(new DataSetRow(new double[]{tt.diffRanking}, new double[]{(tt.win) ? 1 : 0}));
+					break;
+				case 2:
+					ds.addRow(new DataSetRow(new double[]{tt.diffRanking, (tt.prefinal) ? 1 : 0}, new double[]{(tt.win) ? 1 : 0}));
+					break;
+				case 3:
+					ds.addRow(new DataSetRow(new double[]{tt.diffRanking, (tt.prefinal) ? 1 : 0, (tt.indoor) ? 1 : 0}, new double[]{(tt.win) ? 1 : 0}));
+					break;
+				case 4:
+					ds.addRow(new DataSetRow(new double[]{tt.diffRanking, (tt.prefinal) ? 1 : 0, (tt.indoor) ? 1 : 0, (tt.hard) ? 1 : 0}, new double[]{(tt.win) ? 1 : 0}));
+					break;
+				default:
+					ds.addRow(new DataSetRow(new double[]{tt.diffRanking, (tt.prefinal) ? 1 : 0, (tt.indoor) ? 1 : 0, (tt.hard) ? 1 : 0}, new double[]{(tt.win) ? 1 : 0}));
+					break;
+				}
 			}
 			
 			return ds;

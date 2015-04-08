@@ -15,9 +15,11 @@ public class TennisModelBenchmark {
 	public TennisModelBenchmark(){
 		testModels = new ArrayList<ModelWrapper>();
 		
-		TennisNeuralNetworkModel nmm = new TennisNeuralNetworkModel();
+		TennisNeuralNetworkModel nmm 			= new TennisNeuralNetworkModel();
+		TennisRankingModel trm 					= new TennisRankingModel();
+		TennisSimpleNeuralNetworkModel snnm 	= new TennisSimpleNeuralNetworkModel();
 		
-		testModels.add(nmm);
+		testModels.add(snnm);
 	}
 	
 	private boolean getActualResult(String gameId, String playerId){
@@ -35,7 +37,7 @@ public class TennisModelBenchmark {
 	 * Performs a Benchmark on the player games
 	 * 
 	 */
-	public void peformBenchmark(String name){
+	public double performBenchmark(String name){
 		int curTime = (int)(new Date().getTime()/1000);
 		curTime -= validateGameRange;
 		
@@ -51,7 +53,7 @@ public class TennisModelBenchmark {
 			
 			int rightAnswers = 0;
 			
-			Loggar.logln("\nStart predicting " + games.size() + " games!");
+			Loggar.logln("\nStart predicting " + games.size() + " games!\n");
 			
 			for(String gameId: games){
 				double dprediction = mw.predictGame(gameId);
@@ -67,7 +69,11 @@ public class TennisModelBenchmark {
 				}
 			}
 			
-			Loggar.logln("Overall prediction was: " + rightAnswers + "/" + games.size() + " ratio: " + (double)(rightAnswers/(double)games.size()));
+			Loggar.logln("\nOverall prediction was: " + rightAnswers + "/" + games.size() + " ratio: " + (double)(rightAnswers/(double)games.size()) + "\n\n");
+			
+			return (double)(rightAnswers/(double)games.size());
 		}
+		
+		return 0;
 	}
 }

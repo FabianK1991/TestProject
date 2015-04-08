@@ -38,92 +38,36 @@ public class main {
      */
 	public static DBHandler db = new DBHandler();
 	
+	public static void performBenchmark(){
+		TennisModelBenchmark tmb = new TennisModelBenchmark();
+    	
+		double r1 = tmb.performBenchmark("Jeremy Chardy");  //  0.68					0.72
+		double r2 = tmb.performBenchmark("Tomas Berdych");	//  0.8780487804878049		0.75
+		double r3 = tmb.performBenchmark("Simone Bolelli"); //  0.6666666666666666		0.72
+		
+		Loggar.logln(r1 + " - " + r2 + " - " + r3);
+	}
+	
+	
+	public static void parsePlayer(String player){
+		ATPWorldParser wp = new ATPWorldParser();
+    	
+    	try {
+    		wp.searchPlayer(player);
+    	} catch (Exception e){
+    		e.printStackTrace();
+    	}
+	}
+	
 	
     public static void main(String args[]) {
-    	TennisModelBenchmark tmb = new TennisModelBenchmark();
-    	
-    	tmb.peformBenchmark("Nicolas Almagro");
-    	
-    	// INPUT: ENEMY PERFORMANCE LAST 5 GAMES, ENEMY RATING, PERFORMANCE LAST 5 GAMES, HARD COURT, CLAY COURT
-    	
-    	/*ResultSet rs = db.exec("SELECT * FROM GameData");
-		
-		try {
-			while(rs.next()){
-				System.out.println(rs.getString("game_id") + " - " + rs.getString("player_home_id") + " - " + rs.getString("player_guest_id") + " - " + rs.getString("time") + " - " + rs.getString("outcome"));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}*/
+    	System.out.println(TennisPlayerPerformanceCalculator.clearness("L&nbsp;0-6, 7-5, 1-6"));
     	
     	
-    	/*DataSet trainingSet = new DataSet(5, 2);
+    	//performBenchmark();
     	
-        trainingSet.addRow(new DataSetRow(new double[]{0.9, 0.9, 0.1, 0, 1}, new double[]{0, 1}));
-        trainingSet.addRow(new DataSetRow(new double[]{0.2, 0.2, 0.6, 0, 1}, new double[]{1, 0.8}));
-        trainingSet.addRow(new DataSetRow(new double[]{0.6, 0.9, 0.8, 1, 0}, new double[]{0, 0.2}));
-        trainingSet.addRow(new DataSetRow(new double[]{0.4, 0.9, 0.4, 1, 0}, new double[]{0, 0.2}));
-        trainingSet.addRow(new DataSetRow(new double[]{0.4, 0.1, 0.4, 1, 0}, new double[]{1, 0.2}));
-        
-        TennisGamePredictionNetwork net = new TennisGamePredictionNetwork();
-        
-        net.train(trainingSet);
-        
-        double[] out = net.calculate(new double[]{0.2, 0.1, 0.4, 1, 0});
-        
-        System.out.println("Prediction(Win/Loss): " + out[0] + " Clear: " + out[1]);*/
-    	
-    	/*String test = "abasdoiajsdjsad";
-    	
-    	Pattern p = Pattern.compile("(ba)?(sd)");
-    	
-    	Matcher m = p.matcher(test);
-		
-		while(m.find()){
-			Loggar.logln(m.group(1));
-			Loggar.logln(m.group(2));
-		}*/
-    	
-    	
-    	/*
-    	ATPWorldParser wp = new ATPWorldParser();
-    	
-    	// HARDCORE TEST: RAFAEL ANTONIO COUTINHO
-    	
-    	try {
-			//wp.searchPlayer("Rafael Nadal");
-    		wp.searchPlayer("Nicolas Almagro");
-    		
-    		TennisGameTrainingSetGenerator t = new TennisGameTrainingSetGenerator();
-			
-    		// Get DataSet
-    		DataSet ds = t.generateDataSet("Nicolas Almagro");
-			
-			// Train Network
-    		TennisGamePredictionNetwork tn = new TennisGamePredictionNetwork();
-    		
-    		Loggar.logln("Start training!");
-    		
-    		tn.train(ds);
-    		
-    		Loggar.logln("Training finished!!");
-    		
-    		for(double i=0.5;i<1.0;i=i+0.05){
-    			tn.printInput(new double[]{i, 1, 1, 1});
-    		}
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-    	
-    	/*WettpointParser wp = new WettpointParser();
-        
-    	try {
-			wp.searchPlayer("Y. Lu");
-    		//wp.searchPlayer("P. Pimmel");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
+    	//parsePlayer("Tomas BERDYCH");
+    	//parsePlayer("Jeremy Chardy");
+    	//parsePlayer("Simone Bolelli");
     }
 }

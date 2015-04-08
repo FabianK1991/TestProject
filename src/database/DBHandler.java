@@ -3,6 +3,9 @@ package database;
 import java.sql.*;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.List;
+
+import logic.main;
 
 public class DBHandler
 {
@@ -63,6 +66,36 @@ public class DBHandler
 		}
 	}
 	
+	public List<String[]> select(String table_name, String[] values, String condition){
+		String sql = "SELECT " + String.join(",", values) + " FROM " + table_name;
+		
+		if( condition != null && condition.length() > 1 ){
+			sql += " WHERE " + condition;
+		}
+		
+		ResultSet rs = exec(sql, null, true);
+		
+		try {
+			List<String[]> result = new ArrayList<String[]>();
+			
+			while(rs.next()){
+				String[] item = new String[values.length];
+				
+				for(int i=0;i<values.length;i++){
+					item[i] = rs.getString(values[i]);
+				}
+				
+				result.add(item);
+			}
+			
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	private String secure(String o) {
 		return o;
 	}
@@ -72,7 +105,7 @@ public class DBHandler
 	 */
 	
 	
-	public static void main( String args[] )
+	/*public static void main( String args[] )
 	{
 		DBHandler db = new DBHandler();
 		
@@ -85,5 +118,5 @@ public class DBHandler
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 }

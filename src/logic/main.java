@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import nn.TennisGamePredictionNetwork;
+import nn.TennisGameTrainingSetGenerator;
 
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
@@ -86,7 +87,26 @@ public class main {
     	
     	try {
 			//wp.searchPlayer("Rafael Nadal");
-    		wp.searchPlayer("Martin Klizan");
+    		wp.searchPlayer("Nicolas Almagro");
+    		
+    		TennisGameTrainingSetGenerator t = new TennisGameTrainingSetGenerator();
+			
+    		// Get DataSet
+    		DataSet ds = t.generateDataSet("Nicolas Almagro");
+			
+			// Train Network
+    		TennisGamePredictionNetwork tn = new TennisGamePredictionNetwork();
+    		
+    		Loggar.logln("Start training!");
+    		
+    		tn.train(ds);
+    		
+    		Loggar.logln("Training finished!!");
+    		
+    		for(double i=0.5;i<1.0;i=i+0.05){
+    			tn.printInput(new double[]{i, 1, 1, 1});
+    		}
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

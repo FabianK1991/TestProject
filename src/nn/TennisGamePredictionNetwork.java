@@ -1,6 +1,9 @@
 package nn;
 
+import java.util.Arrays;
+
 import org.neuroph.core.Layer;
+import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
@@ -9,7 +12,7 @@ import org.neuroph.nnet.learning.BackPropagation;
 /*
  * 		INPUT: ENEMY RANKING, ROUND (PREFINAL / FINAL), INDOOR / OUTDOOR, HARD / SOFT
  * 
- * 		OUTPUT: WIN / LOSS, DEUTLICH / WENIGER DEUTLICH
+ * 		OUTPUT: WIN / LOSS //, DEUTLICH / WENIGER DEUTLICH
  * 
  * 
  * 		ZU PERFORMANCE: PREFINAL, SEMI FINAL, FINAL
@@ -22,11 +25,12 @@ public class TennisGamePredictionNetwork {
 	private BackPropagation learningRule;
 	
 	public TennisGamePredictionNetwork(){
-		neuralNet = new MultiLayerPerceptron(5, 8, 2);
+		neuralNet = new MultiLayerPerceptron(4, 4, 1);
 		
 		learningRule = neuralNet.getLearningRule();
-		learningRule.setLearningRate(0.05);
-		learningRule.setMaxIterations(10000000);
+		learningRule.setLearningRate(0.1);
+		learningRule.setMaxError(0.1);
+		learningRule.setMaxIterations(100000);
 	}
 	
 	public void train(DataSet trainingSet){
@@ -39,4 +43,13 @@ public class TennisGamePredictionNetwork {
         
         return neuralNet.getOutput();
 	}
+	
+	public void printInput(double[] input){
+    	neuralNet.setInput(input);
+        neuralNet.calculate();
+        double[] networkOutput = neuralNet.getOutput();
+
+        System.out.print("Input: " + Arrays.toString(input) );
+        System.out.println(" Output: " + Arrays.toString(networkOutput) );
+    }
 }

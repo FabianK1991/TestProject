@@ -22,11 +22,11 @@ public class TestNetwork {
  
             // create training set (logical AND function)
             DataSet trainingSet = new DataSet(2, 1);
-            trainingSet.addRow(new DataSetRow(new double[]{0.5, 0.5}, new double[]{0}));
-            trainingSet.addRow(new DataSetRow(new double[]{0, 0}, new double[]{1}));
+            trainingSet.addRow(new DataSetRow(new double[]{0.85, 1.0}, new double[]{1}));
+            trainingSet.addRow(new DataSetRow(new double[]{0.8, 1.0}, new double[]{0}));
             //trainingSet.addRow(new DataSetRow(new double[]{0, 0}, new double[]{1}));
             //trainingSet.addRow(new DataSetRow(new double[]{0, 0}, new double[]{1}));
-            trainingSet.addRow(new DataSetRow(new double[]{1, 1}, new double[]{1}));
+            trainingSet.addRow(new DataSetRow(new double[]{0.83, 1.0}, new double[]{1}));
 
             // create perceptron neural network
             //NeuralNetwork myPerceptron = new Perceptron(2, 1);
@@ -50,6 +50,7 @@ public class TestNetwork {
             
            // testNeuralNetwork(myPerceptron, trainingSet);
             testNeuralNetwork(neuralNet, trainingSet);
+            printInput(new double[]{0.82, 1.0},neuralNet);
             
             // save trained perceptron
           //  myPerceptron.save("mySamplePerceptron.nnet");
@@ -60,6 +61,15 @@ public class TestNetwork {
             //testNeuralNetwork(loadedPerceptron, trainingSet);
 
     }
+    
+    public static void printInput(double[] input, NeuralNetwork neuralNet){
+    	neuralNet.setInput(input);
+        neuralNet.calculate();
+        double[] networkOutput = neuralNet.getOutput();
+
+        System.out.print("Input: " + Arrays.toString(input) );
+        System.out.println(" Output: " + Arrays.toString(networkOutput) );
+    }
 
     /**
      * Prints network output for the each element from the specified training set.
@@ -68,12 +78,7 @@ public class TestNetwork {
      */
     public static void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
         for(DataSetRow trainingElement : testSet.getRows()) {
-            neuralNet.setInput(trainingElement.getInput());
-            neuralNet.calculate();
-            double[] networkOutput = neuralNet.getOutput();
-
-            System.out.print("Input: " + Arrays.toString(trainingElement.getInput()) );
-            System.out.println(" Output: " + Arrays.toString(networkOutput) );
+        	printInput(trainingElement.getInput(), neuralNet);
         }
     }
 }

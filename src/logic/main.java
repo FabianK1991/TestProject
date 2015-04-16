@@ -16,6 +16,7 @@ import parsing.ATPWorldParser;
 import parsing.WettpointParser;
 import testing.TennisModelBenchmark;
 import util.Loggar;
+import util.TennisCalculatorHelper;
 
 public class main {
     /**
@@ -48,7 +49,6 @@ public class main {
 		Loggar.logln(r1 + " - " + r2 + " - " + r3);
 	}
 	
-	
 	public static void parsePlayer(String player){
 		ATPWorldParser wp = new ATPWorldParser();
     	
@@ -61,8 +61,8 @@ public class main {
 	
 	
     public static void main(String args[]) {
-    	System.out.println(TennisPlayerPerformanceCalculator.clearness("L&nbsp;0-6, 7-5, 1-6"));
-    	
+    	//System.out.println(TennisPlayerPerformanceCalculator.clearness("L&nbsp;0-6, 7-5, 1-6"));
+    	System.out.println(TennisCalculatorHelper.getLinearValue(60, 10, 0.3, 100, 1.0));
     	
     	//performBenchmark();
     	

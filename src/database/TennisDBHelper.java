@@ -8,6 +8,38 @@ import java.util.List;
 import logic.main;
 
 public class TennisDBHelper {
+	public static TennisGame getTennisGame(String id){
+		String sql = "SELECT * FROM Tennis_Games WHERE id = '" + id.replace("'", "") + "'";
+		
+		ResultSet rs = main.db.exec(sql, null, true);
+		
+		try {
+			if(rs.next()){
+				TennisGame result = new TennisGame();
+				
+				result.id = Integer.parseInt(id);
+				
+				result.first_player_id = rs.getInt("first_player_id");
+				result.first_player_ranking = rs.getInt("first_player_ranking");
+				
+				result.second_player_id = rs.getInt("second_player_id");
+				result.second_player_ranking = rs.getInt("second_player_ranking");
+				
+				result.result = rs.getInt("result");
+				result.result_string = rs.getString("result_string");
+				
+				result.tournament_id = rs.getInt("tournament_id");
+				result.round = rs.getString("round");
+				
+				return result;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	public static String getPlayerId(String name){
 		String sql = "SELECT id FROM Tennis_Player WHERE name = '" + name.replace("'", "") + "'";
 		
